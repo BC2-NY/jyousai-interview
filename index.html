@@ -173,53 +173,54 @@ async function gasGet(key) {
   console.log('✓ GET value:', j.value);
   return j.value ?? null;
 }
-async function gasSet(key, value) {
-  console.log('💾 POST:', key, typeof value);
-  const payload = JSON.stringify({key, value});
-  console.log('💾 payload size:', payload.length, 'bytes');
+async function gasGet() {
+  const r = await fetch(GAS_URL);
+  if (!r.ok) throw new Error('GET failed');
+  const j = await r.json();
+  return j.value ?? null;
+}
+async function gasSet(value) {
   const r = await fetch(GAS_URL, {
     method: 'POST',
-    body: payload
+    body: JSON.stringify({ value })
   });
-  console.log('✓ POST response:', r.status);
-  if (!r.ok) throw new Error(`POST failed: ${r.status}`);
-  const j = await r.json();
-  console.log('✓ POST result:', j);
-  if (j.error) throw new Error(`API error: ${j.error}`);
-  return j;
+  if (!r.ok) throw new Error('POST failed');
 }
-
 // ══ SYNC ══════════════════════════════════════════════════
 async function loadRemote() {
   try {
-    console.log('🔄 loadRemote started');
-    const [ro, rm, rd] = await Promise.all([
-      gasGet('order'), gasGet('memos'), gasGet('done')
-    ]);
+    const raw = await gasGet();
+    if (!raw) { setSyncOk(); return; }
+    const remote = JSON.parse(raw);
     let changed = false;
-    if (ro) { const v = JSON.parse(ro); if (JSON.stringify(v) !== JSON.stringify(order)) { order=v; changed=true; console.log('✓ order updated'); } }
-    if (rm) { const v = JSON.parse(rm); if (JSON.stringify(v) !== JSON.stringify(memos)) { memos=v; changed=true; console.log('✓ memos updated'); } }
-    if (rd) { const v = JSON.parse(rd); const ns = new Set(v); if ([...ns].sort().join()!=[...doneSet].sort().join()) { doneSet=ns; changed=true; console.log('✓ done updated'); } }
+    if (remote.order && JSON.stringify(remote.order) !== JSON.stringify(order)) {
+      order = remote.order; changed = true;
+    }
+    if (remote.memos && JSON.stringify(remote.memos) !== JSON.stringify(memos)) {
+      memos = remote.memos; changed = true;
+    }
+    if (remote.done) {
+      const ns = new Set(remote.done);
+      if ([...ns].sort().join() !== [...doneSet].sort().join()) {
+        doneSet = ns; changed = true;
+      }
+    }
     setSyncOk();
-    if (changed && !document.activeElement.closest('.memo-area')) { render(); if (panelOpen) renderSortList(); }
-  } catch(e) { console.error('❌ loadRemote error:', e); setSyncErr(); }
+    if (changed && !document.activeElement.closest('.memo-area')) {
+      render(); if (panelOpen) renderSortList();
+    }
+  } catch(e) { setSyncErr(); }
 }
 
 async function saveRemote() {
   if (saving) return;
-  const snap = JSON.stringify({order, memos, done:[...doneSet]});
-  if (snap === lastSaved) { console.log('⏭️ saveRemote: no changes'); return; }
+  const snap = JSON.stringify({ order, memos, done: [...doneSet] });
+  if (snap === lastSaved) return;
   saving = true; setSyncIng();
   try {
-    console.log('💾 saveRemote: sending data...');
-    await Promise.all([
-      gasSet('order', JSON.stringify(order)),
-      gasSet('memos', JSON.stringify(memos)),
-      gasSet('done',  JSON.stringify([...doneSet]))
-    ]);
+    await gasSet(snap);
     lastSaved = snap; setSyncOk();
-    console.log('✓ saveRemote: success');
-  } catch(e) { console.error('❌ saveRemote error:', e); setSyncErr(); }
+  } catch(e) { setSyncErr(); }
   saving = false;
 }
 

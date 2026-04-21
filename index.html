@@ -222,8 +222,8 @@ function startPolling() {
 // ══ SETUP ═════════════════════════════════════════════════
 function checkSetup() {
   const saved = localStorage.getItem(LS_KEY);
-  if (saved) { GAS_URL = saved; showMain(); }
-  else { document.getElementById('setupScreen').style.display='flex'; }
+  if (saved) { GAS_URL = saved; }
+  showMain();
 }
 
 document.getElementById('setupSaveBtn').addEventListener('click', async () => {

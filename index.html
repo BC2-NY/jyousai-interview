@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>情祭 面接カード</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#f7f6f2;--surface:#fff;--border:#e4e2da;--border2:#cccac0;
+  --text:#1c1b18;--text2:#6b6960;--text3:#a09e95;
+  --accent:#3730a3;--accent-bg:#eef2ff;
+  --r1-bg:#fef3c7;--r1-t:#92400e;--r1-b:#fcd34d;
+  --r2-bg:#dbeafe;--r2-t:#1e40af;--r2-b:#93c5fd;
+  --r3-bg:#d1fae5;--r3-t:#065f46;--r3-b:#6ee7b7;
+  --r4-bg:#f3f4f6;--r4-t:#374151;--r4-b:#d1d5db;
+  --r5-bg:#fce7f3;--r5-t:#9d174d;--r5-b:#f9a8d4;
+  --r6-bg:#fff7ed;--r6-t:#9a3412;--r6-b:#fdba74;
+  --radius:12px;
+}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* ── SETUP SCREEN ── */
+#setupScreen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px;gap:0;}
+.setup-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px 24px;width:100%;max-width:440px;}
+.setup-title{font-size:18px;font-weight:700;margin-bottom:4px;}
+.setup-sub{font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.6;}
+.setup-label{font-size:12px;font-weight:500;color:var(--text2);margin-bottom:6px;display:block;}
+.setup-input{width:100%;font-size:14px;padding:10px 12px;border:1px solid var(--border2);border-radius:8px;background:var(--bg);color:var(--text);outline:none;font-family:inherit;margin-bottom:14px;}
+.setup-input:focus{border-color:var(--accent);}
+.setup-btn{width:100%;padding:12px;font-size:14px;font-weight:700;border-radius:8px;border:none;background:var(--accent);color:#fff;cursor:pointer;font-family:inherit;}
+.setup-btn:hover{opacity:.88;}
+.setup-btn:disabled{opacity:.5;cursor:not-allowed;}
+.setup-err{font-size:12px;color:#dc2626;margin-top:8px;display:none;}
+
+/* ── TOP BAR ── */
+.topbar{position:sticky;top:0;z-index:200;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;padding:10px 14px;flex-wrap:wrap;}
+.topbar-title{font-size:15px;font-weight:700;flex:1;}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:#f59e0b;flex-shrink:0;transition:background .3s;}
+.sync-dot.ok{background:#10b981;}.sync-dot.err{background:#ef4444;}
+.sync-label{font-size:11px;color:var(--text3);}
+.count-pill{font-size:11px;color:var(--text2);background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:3px 10px;}
+.icon-btn{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:6px 11px;border-radius:8px;border:1px solid var(--border2);background:var(--surface);color:var(--text);cursor:pointer;white-space:nowrap;font-family:inherit;}
+.icon-btn:hover{background:var(--bg);}
+.search-wrap{padding:10px 14px 0;}
+.search-input{width:100%;font-size:14px;padding:9px 12px;border:1px solid var(--border);border-radius:9px;background:var(--surface);color:var(--text);outline:none;font-family:inherit;}
+.search-input:focus{border-color:var(--accent);}
+
+/* ── CARDS ── */
+.list{padding:10px 12px 28px;display:flex;flex-direction:column;gap:10px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:opacity .2s;}
+.card.is-done{opacity:.45;}
+.card-header{display:flex;align-items:center;gap:10px;padding:12px 14px 10px;}
+.order-num{width:28px;height:28px;border-radius:50%;background:var(--accent-bg);color:var(--accent);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.name-block{flex:1;min-width:0;}
+.name{font-size:16px;font-weight:700;line-height:1.2;}
+.kana{font-size:11px;color:var(--text3);margin-top:1px;}
+.sid{font-size:11px;color:var(--text2);background:var(--bg);border:1px solid var(--border);padding:2px 8px;border-radius:4px;flex-shrink:0;max-width:88px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.dept-row{display:flex;flex-wrap:wrap;gap:5px;padding:0 14px 10px;}
+.dept-tag{display:flex;align-items:center;gap:3px;font-size:11px;font-weight:500;padding:3px 9px;border-radius:20px;border:1px solid;}
+.r1{background:var(--r1-bg);color:var(--r1-t);border-color:var(--r1-b);}
+.r2{background:var(--r2-bg);color:var(--r2-t);border-color:var(--r2-b);}
+.r3{background:var(--r3-bg);color:var(--r3-t);border-color:var(--r3-b);}
+.r4{background:var(--r4-bg);color:var(--r4-t);border-color:var(--r4-b);}
+.r5{background:var(--r5-bg);color:var(--r5-t);border-color:var(--r5-b);}
+.r6{background:var(--r6-bg);color:var(--r6-t);border-color:var(--r6-b);}
+.reason-block{padding:0 14px 10px;}
+.reason-label{font-size:11px;color:var(--text3);margin-bottom:3px;}
+.reason-text{font-size:13px;color:var(--text2);line-height:1.65;word-break:break-all;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+.reason-text.expanded{display:block;}
+.expand-btn{font-size:11px;color:var(--accent);background:none;border:none;cursor:pointer;padding:2px 0 0;font-family:inherit;}
+hr.div{border:none;border-top:1px solid var(--border);margin:0 14px;}
+.memo-block{padding:8px 14px 10px;}
+.memo-label{font-size:11px;color:var(--text3);margin-bottom:3px;}
+.memo-area{width:100%;font-size:13px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);resize:none;font-family:inherit;min-height:52px;outline:none;}
+.memo-area:focus{border-color:var(--accent);}
+.card-footer{display:flex;align-items:center;justify-content:flex-end;padding:0 14px 10px;}
+.done-btn{font-size:12px;font-weight:500;padding:5px 14px;border-radius:20px;border:1px solid var(--border2);background:var(--surface);color:var(--text2);cursor:pointer;font-family:inherit;}
+.done-btn.done{background:var(--r3-bg);color:var(--r3-t);border-color:var(--r3-b);}
+
+/* ── SORT PANEL ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:300;opacity:0;pointer-events:none;transition:opacity .2s;}
+.overlay.open{opacity:1;pointer-events:all;}
+.sort-panel{position:fixed;bottom:0;left:0;right:0;max-height:85vh;background:var(--surface);border-radius:20px 20px 0 0;z-index:301;transform:translateY(100%);transition:transform .28s cubic-bezier(.32,.72,0,1);display:flex;flex-direction:column;}
+.sort-panel.open{transform:translateY(0);}
+.panel-hd{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 12px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.panel-title{font-size:15px;font-weight:700;}
+.panel-sub{font-size:12px;color:var(--text3);margin-top:2px;}
+.panel-close{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--text2);font-family:inherit;}
+.panel-body{overflow-y:auto;flex:1;padding:8px 12px 20px;}
+.sort-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;background:var(--surface);border:1px solid var(--border);margin-bottom:6px;cursor:grab;touch-action:none;user-select:none;}
+.sort-item.dragging{opacity:.3;}
+.sort-item.drag-over{border:2px dashed var(--accent);background:var(--accent-bg);}
+.sort-num{width:22px;height:22px;border-radius:50%;background:var(--accent-bg);color:var(--accent);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sort-name{font-size:14px;font-weight:500;flex:1;}
+.sort-kana{font-size:11px;color:var(--text3);}
+.sort-handle{color:var(--text3);font-size:18px;flex-shrink:0;}
+.empty{text-align:center;padding:48px 16px;color:var(--text3);font-size:14px;}
+</style>
+</head>
+<body>
+
+<!-- ══ SETUP SCREEN ══ -->
+<div id="setupScreen">
+  <div class="setup-card">
+    <div class="setup-title">初回設定</div>
+    <div class="setup-sub">Google Apps Script の Web アプリ URL を入力してください。<br>設定は端末に保存されます（次回から不要）。</div>
+    <label class="setup-label">GAS Web アプリ URL</label>
+    <input class="setup-input" id="gasUrlInput" type="url" placeholder="https://script.google.com/macros/s/..." autocomplete="off">
+    <button class="setup-btn" id="setupSaveBtn">接続して始める</button>
+    <div class="setup-err" id="setupErr">接続に失敗しました。URLを確認してください。</div>
+  </div>
+</div>
+
+<!-- ══ MAIN APP ══ -->
+<div id="mainApp" style="display:none;">
+  <div class="topbar">
+    <span class="topbar-title">情祭 面接カード</span>
+    <div class="sync-dot" id="syncDot"></div>
+    <span class="sync-label" id="syncLabel">接続中…</span>
+    <span class="count-pill" id="countPill"></span>
+    <button class="icon-btn" id="openSortBtn">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 4h12M4 8h8M6 12h4"/></svg>
+      並び替え
+    </button>
+    <button class="icon-btn" id="resetUrlBtn" title="URL再設定">⚙</button>
+  </div>
+  <div class="search-wrap">
+    <input class="search-input" id="searchInput" type="search" placeholder="名前・学籍番号で検索…">
+  </div>
+  <div class="list" id="cardList"></div>
+</div>
+
+<!-- ══ SORT PANEL ══ -->
+<div class="overlay" id="overlay"></div>
+<div class="sort-panel" id="sortPanel">
+  <div class="panel-hd">
+    <div>
+      <div class="panel-title">面接順の並び替え</div>
+      <div class="panel-sub">ドラッグして順番を変更 → 全員に自動同期</div>
+    </div>
+    <button class="panel-close" id="closeSortBtn">×</button>
+  </div>
+  <div class="panel-body" id="sortList"></div>
+</div>
+
+<script>
+// ══ DATA ══════════════════════════════════════════════════
+const RAW = [{"id":"情25-101","name":"織田信義テスト","kana":"オダノブヨシ","depts":[{"name":"常任","rank":1},{"name":"構成","rank":2},{"name":"ライブ","rank":3},{"name":"講演","rank":4},{"name":"パンフ","rank":5},{"name":"模擬","rank":6}],"reason":"楽しそうだったから"},{"id":"情　26-0447","name":"松永育子","kana":"マツナガイクコ","depts":[{"name":"常任","rank":1},{"name":"広報","rank":2},{"name":"企画","rank":3},{"name":"模擬","rank":4}],"reason":"大学生活で一生心に残る思い出を作りたいのもあるし、ガクチカにもなれるといいことばっかりしかないので、行くしかないと思いました。特に常任の皆さんがキラキラしていて、それに憧れたことも理由にあります！"},{"id":"情26-359","name":"西関　友哉","kana":"ニシゼキ　トモヤ","depts":[{"name":"パンフ","rank":1}],"reason":"元々情祭に入りたいと思っていて、それぞれの局の活動する内容を聞いたときにパンフレットが1番面白そうだと思って応募しました。"},{"id":"情26-0520","name":"吉浦優和","kana":"ヨシウラユウト","depts":[{"name":"模擬","rank":1},{"name":"ステ外","rank":2},{"name":"パンフ","rank":3},{"name":"広報","rank":4},{"name":"講演","rank":5},{"name":"企画","rank":6}],"reason":"僕は大学生活で、企画・運営などの活動をするサークルや委員会に入りたいと思い、情祭を志望しました。高校生活では生徒会活動していたので、その時の企画・運営する力を活かして、人一倍貢献します。僕が情祭に入ることができた時は、幅広い業務に積極的に取り組みたいと考えています。"},{"id":"情26-0527","name":"吉田実由","kana":"ヨシダミユ","depts":[{"name":"財務","rank":1},{"name":"備品","rank":2},{"name":"広報","rank":3}],"reason":"人見知りで初対面の人と話すときは緊張してしまい、自分から積極的に話しかけるのが苦手なので、情祭のような多くの人と関わることのできる場所に身を置くことで、色々な人と交流し自分の短所を少しずつ克服していきたいです。また、大学生活を振り返ったときに充実していたと思えるよう、合宿などの企画がとても楽しそうな情祭に入りたいと思いました。"},{"id":"情26-238","name":"菅原悠","kana":"スガハラユウ","depts":[{"name":"パンフ","rank":1},{"name":"ステ外","rank":2},{"name":"広報","rank":3},{"name":"模擬","rank":4},{"name":"ライブ","rank":5},{"name":"講演","rank":6}],"reason":"この学科を選ぶ中で、カリキュラムだけでなく関西大学の学祭実行委員のInstagramを見て、すごく惹かれました。楽しそうというだけでなく、多くの人が関わって一つのイベントを作り上げているところに魅力を感じました。高校ではデザインを考えるのが好きで、文化祭では看板や模擬店の装飾などを自分から提案し、実際に制作してきました。自分の考えたものが形になって、周りの人が楽しんでくれた経験がとても印象に残っています。大学では情祭に入り、仲間と協力しながら一つのものを作り上げたいです。大変なこともあると思いますが、その分やりがいや達成感も大きいと思うので、積極的に関わっていきたいと考えています。また、活動を通して先輩や仲間と仲を深めながら、日常も大切にして、楽しく充実した大学生活を送りたいです。"},{"id":"情26-0085","name":"江守　陸","kana":"エモリ リク","depts":[{"name":"講演","rank":1},{"name":"ライブ","rank":2},{"name":"模擬","rank":3},{"name":"ステ外","rank":4},{"name":"パンフ","rank":5},{"name":"構成","rank":6}],"reason":"先輩の話を聞いて楽しそうだなと思った。\nいろんな人との交流を増やしたい。"},{"id":"情26-467","name":"三好慧拓","kana":"ミヨシケイタ","depts":[{"name":"模擬","rank":1},{"name":"常任","rank":2},{"name":"ライブ","rank":3},{"name":"舞台","rank":4},{"name":"財務","rank":5},{"name":"講演","rank":6}],"reason":"他キャンパスの方々との親交を深め交流をさらに増やしたいと思ったから"},{"id":"情26-0341","name":"中村琉生","kana":"ナカムラルイ","depts":[{"name":"ステ外","rank":1}],"reason":"お話し会や新歓でステ外の仕事や先輩を知っていくうちに、自分もステ外として情祭を盛り上げたいと思い志望しました。ステ外での活動を通して、キャンパス祭や学園祭の成功に貢献していきたいと考えています。"},{"id":"26-368","name":"西村悠","kana":"ニシムラユウ","depts":[{"name":"講演","rank":1},{"name":"舞台","rank":2},{"name":"パンフ","rank":3},{"name":"常任","rank":4},{"name":"ステ外","rank":4},{"name":"ライブ","rank":5},{"name":"模擬","rank":6}],"reason":""},{"id":"情26-193","name":"佐伯 恭","kana":"サイキ キョウ","depts":[{"name":"ステ外","rank":1}],"reason":"履修相談の時に情祭に魅力を持ち、zoomや新歓に行く中で自分もここで活動してみたいと思った。"},{"id":"情26-0124","name":"門野美桜","kana":"カドノミオ","depts":[{"name":"舞台","rank":1},{"name":"ステ外","rank":2},{"name":"パンフ","rank":3},{"name":"広報","rank":3},{"name":"構成","rank":4},{"name":"模擬","rank":5},{"name":"常任","rank":6},{"name":"企画","rank":6}],"reason":"私は、新入生歓迎行事で1年生を全力で楽しませようと奮闘する先輩方の姿に深く感銘を受け、この「総合情報学部祭典実行委員会」の一員として、学年の垣根を超えて最高の一時を創り上げたいと強く志望しました。ただ楽しむ側ではなく、友情を大切にしながら、各々が責任を持って成長できるこの環境で、自分も貢献したいと考えています。\n現在、スターバックスでバリスタとして勤務しており、「状況把握能力」と「チームのために動く行動力」を磨いています。\n具体的には、フロアでの食器回収や荷物置きの提供など、常にお客様の動きを先読みした行動を心がけています。また、レジではお客様との会話から好みを探り「最高の一杯」を提案するなど、対人コミュニケーションにも自信があります。祭典の運営においても、仲間とミスを補い合い、来場者のニーズに迅速に応えることで、円滑なイベント運営に貢献したいと考えています。\nまた、高校時代の生徒会活動を通じ、地味な作業をコツコツとこなす大切さも理解しています。企画力や統制力で評価をいただいた経験もありますが、何より私の強みは、一度決めたことをやり遂げる継続力です。実際に、高校3年間は高い目標を持ち続け、評定平均4.8を維持することができました。この粘り強さを活かし、半年以上の長い準備期間も、責任を持って全うする覚悟です。\n仲間と協力して企画を練り上げ、会場を全力で盛り上げたいです。持ち前の明るさと真面目さを活かし、祭典の成功に向けて全力を尽くします。\n長文になってしまい申し訳ありません。\nしかしこの熱量が先輩方に伝わっていたら幸いです 。\n最後までお読みくださりありがとうございます。"},{"id":"情26-484","name":"門田知大","kana":"モンダハルト","depts":[{"name":"パンフ","rank":1},{"name":"ステ外","rank":2},{"name":"模擬","rank":3},{"name":"広報","rank":4},{"name":"常任","rank":5},{"name":"財務","rank":6}],"reason":"高槻キャンパスで千里山をこえる祭りを開催したいから"},{"id":"情26-0288","name":"谷瀬　綾乃","kana":"タニセ　アヤノ","depts":[{"name":"講演","rank":1},{"name":"ライブ","rank":2},{"name":"常任","rank":3},{"name":"広報","rank":4},{"name":"構成","rank":5},{"name":"財務","rank":6}],"reason":"高校生の頃から学園祭実行委員のサークルに入りたいと思っていたからです！総合情報学部に合格してからは、情祭のInstagramを拝見しており、先輩方のキラキラした活動する姿を見て、ますます入りたいという気持ちが強くなりました！初めはガクチカになるからという理由だけでしたが、入学してからは履修相談会やお話会、ビンゴ大会に参加させていただき、今では情祭で大学生活を楽しみたい、盛り上げたいと思っています！！また、総情だけでなく他の学部の方との交流もしてみたいです！！私は将来テレビ局等で働きたいという夢があることもあり、公演局を志望していますが、どの局でも全力で楽しみ、学園祭を盛り上げたいと思っています！よろしくお願いします！！"},{"id":"情26-0464","name":"宮澤真桜","kana":"ミヤザワマオ","depts":[{"name":"ライブ","rank":1},{"name":"企画","rank":1},{"name":"ステ外","rank":2},{"name":"舞台","rank":3},{"name":"パンフ","rank":4},{"name":"模擬","rank":5},{"name":"広報","rank":6}],"reason":"入学前にインスタを拝見して、凄く凄く楽しそうだったからです。そして、インスタの写真を見て、学祭期間は全力で取り組み、学祭期間以外もみんな仲良く遊んでいる様子がとても素敵だと思ったからです。"},{"id":"情26-0452","name":"美甘夏希","kana":"ミカモナツキ","depts":[{"name":"ステ外","rank":1},{"name":"企画","rank":1},{"name":"模擬","rank":2},{"name":"講演","rank":3},{"name":"舞台","rank":4},{"name":"構成","rank":5},{"name":"ライブ","rank":6}],"reason":"入学式前から別学部で先輩が所属しておりインスタを拝見して何事にも全力で取り組んでいる姿に憧れ自分も情祭に入りたいと思ったからです。"},{"id":"情26-0248","name":"鈴木 優輔","kana":"スズキユウスケ","depts":[{"name":"常任","rank":1},{"name":"ライブ","rank":2},{"name":"構成","rank":3},{"name":"パンフ","rank":4},{"name":"模擬","rank":5}],"reason":"自分の長所である行動力や好奇心旺盛であることを活かし、この情祭を更に盛り上げて行きたいと思ったから。また、自身の経験値を情祭での活動を通して高めていきたいとおもったから。"},{"id":"情26-0376","name":"萩原なるみ","kana":"ハギワラナルミ","depts":[{"name":"ステ外","rank":1},{"name":"構成","rank":2},{"name":"パンフ","rank":3},{"name":"模擬","rank":4},{"name":"常任","rank":5},{"name":"広報","rank":6}],"reason":"中学と高校では委員会などには入ったことが無かったのですが、興味が無かった訳ではなく時間が取れないと判断したため仕方なく入りませんでした。関大に入学して情祭のことを知り、時間のある今の大学生活の中ならと考えて、入りたいと思いました。"},{"id":"情26-531","name":"吉村健","kana":"ヨシムラタケル","depts":[{"name":"舞台","rank":1},{"name":"構成","rank":2},{"name":"模擬","rank":3}],"reason":"お話会聞いて1番楽しそうと思ったし先輩方々と関わりやすかったからです"},{"id":"情 26-0169","name":"久保瑠美","kana":"クボルミ","depts":[{"name":"舞台","rank":1},{"name":"広報","rank":2},{"name":"模擬","rank":3},{"name":"常任","rank":4},{"name":"ライブ","rank":5},{"name":"企画","rank":6}],"reason":"楽しそうで、たくさん迷って最後のレクリエーションに参加したとき、めっちゃ楽しくて、先輩も優しかったからです。みんなでキラキラした思い出作りたいと思ったからもあります。"},{"id":"情26-2009","name":"上甲彩加","kana":"ジョウコウサヤカ","depts":[{"name":"舞台","rank":1},{"name":"模擬","rank":2},{"name":"ステ外","rank":3},{"name":"パンフ","rank":4},{"name":"企画","rank":4}],"reason":"編入ということもあり、短大時代にサークルに所属してなかったので新しいことに挑戦したいから。"},{"id":"26-0188","name":"小林寛大","kana":"コバヤシ　カンダイ","depts":[{"name":"常任","rank":1}],"reason":"トップになりたい"},{"id":"情20-0422","name":"藤山珠莉","kana":"フジヤマジュリ","depts":[{"name":"舞台","rank":1},{"name":"広報","rank":2},{"name":"パンフ","rank":3},{"name":"模擬","rank":4},{"name":"ステ外","rank":5},{"name":"構成","rank":6}],"reason":"先輩方の様子を見ていて興味を持ち、話を聞くうちにやりたいという気持ちが強くなっため。また、仲間と様々な経験をすることは将来に役立つと思っており、何かをこの大学生活でやってみたいと思っていたところ、情祭という選択肢があり、経験したいと思ったため。"},{"id":"情26-56","name":"井上大河","kana":"イノウエタイガ","depts":[{"name":"ライブ","rank":1},{"name":"舞台","rank":2},{"name":"ステ外","rank":3}],"reason":"高校の頃生徒会に入っていたため興味があったのと、実際相談会や新歓に行ってみて楽しそうだと思ったからです。"},{"id":"情26-361","name":"西野友基","kana":"ニシノトモキ","depts":[{"name":"模擬","rank":1},{"name":"ステ外","rank":2},{"name":"構成","rank":3},{"name":"舞台","rank":4}],"reason":"入学して間もない頃に履修登録相談会で、そら先輩から大学生活・サークルのことなどを丁寧におしえていただき、とても優しくサポートしていただきました。それがきっかけで情祭に興味が湧きもっと知りたいと思うようになりました。それから、そら先輩の他にも模擬の先輩方とお話させていただき仕事内容を知った上で、情祭に入り模擬で過ごすことができれば大学生活がさらに楽しくなると確信しました。やらなければいけない当たり前の仕事をこなすことはもちろん、会議や行事にも積極的に参加し情祭の先輩方と一緒に大学を盛り上げます！よろしくお願いします！"},{"id":"情26-0440","name":"町田鈴","kana":"マチダスズ","depts":[{"name":"ステ外","rank":1},{"name":"舞台","rank":2}],"reason":"入学前からInstagramを拝見しており、メンバー間の距離が近く、みんなで一つの物事を成功させようとしている姿勢に強く惹かれました。また、高校時代に遠足などの企画をした経験があり、協力して行事を作り上げる楽しさを知りました。大学でも情祭の活動を通して、最高に充実した時間を仲間と共に全力で作り上げたいと考えています！よろしくお願いします！！"},{"id":"情26-0088","name":"追立渉","kana":"オイタテワタル","depts":[{"name":"パンフ","rank":1},{"name":"舞台","rank":2},{"name":"ステ外","rank":3},{"name":"模擬","rank":4},{"name":"ライブ","rank":5},{"name":"企画","rank":6}],"reason":"高校の学園祭において副団長として団をまとめたり学園祭の企画、運営に関わった経験がとても楽しかったため、大学でもそのような団体に所属して学園祭を盛り上げていきたいと思ったから。"},{"id":"情26-460","name":"道口 昂生","kana":"ミチグチ イブキ","depts":[{"name":"パンフ","rank":1},{"name":"財務","rank":2}],"reason":"新歓での先輩たちのサークルの雰囲気や、暖かい雰囲気が心地よかった。\n色んな人脈も広げたいし、何より人と喋りたいです！"},{"id":"情26-0111","name":"小野琴音","kana":"オノコトネ","depts":[{"name":"舞台","rank":1},{"name":"広報","rank":2},{"name":"模擬","rank":3},{"name":"ステ外","rank":4},{"name":"常任","rank":5},{"name":"構成","rank":6}],"reason":"情祭を盛り上げたいと思ったから、先輩が皆仲良さそうで楽しそうだったから。"},{"id":"情26-0479","name":"森田花奈子","kana":"森田花奈子","depts":[{"name":"パンフ","rank":1},{"name":"常任","rank":2},{"name":"模擬","rank":3},{"name":"ライブ","rank":4},{"name":"広報","rank":5},{"name":"財務","rank":6}],"reason":"他学部と関われる機会もあるからガクチカになるし、仲良くて楽しそうやから"},{"id":"情26-316","name":"泊穂香","kana":"トマリホノカ","depts":[{"name":"ステ外","rank":1},{"name":"パンフ","rank":2},{"name":"模擬","rank":3},{"name":"広報","rank":4},{"name":"常任","rank":5},{"name":"講演","rank":6}],"reason":"色んな人と沢山関わりたいから"},{"id":"情26-0064","name":"岩井理子","kana":"イワイリコ","depts":[{"name":"ステ外","rank":1},{"name":"パンフ","rank":2},{"name":"広報","rank":3},{"name":"模擬","rank":4},{"name":"舞台","rank":5}],"reason":"色んな人と関わってみたいし、新しいことにチャレンジしたいから"},{"id":"26-456","name":"水口瑛太","kana":"ミズグチエイタ","depts":[{"name":"パンフ","rank":1},{"name":"ステ外","rank":2},{"name":"舞台","rank":3},{"name":"模擬","rank":4},{"name":"企画","rank":5},{"name":"広報","rank":6}],"reason":"中学、高校では友達はいたけど学校の中でだけ仲良くすることがほとんどだったので大学ではもっと大学の中でも外でも仲良くできるような友達が欲しいと思ったので情祭に入りたいと思いました！初対面の人でも臆さずに話しかけることは得意なのでもし情祭に入れたら他の局の人との交流や千里山キャンパスの人とも積極的に会話して話し合いの面で貢献したいです！"},{"id":"情26-529","name":"吉見陸飛","kana":"ヨシミリクト","depts":[{"name":"模擬","rank":1},{"name":"ステ外","rank":2},{"name":"パンフ","rank":3},{"name":"広報","rank":4},{"name":"ライブ","rank":5},{"name":"企画","rank":5},{"name":"備品","rank":6}],"reason":"大学生活楽しみたいのと、情祭みんな仲良さそうでいろんな人と友達になりたいから"},{"id":"情26-378","name":"橋本篤弥","kana":"ハシモトアツヤ","depts":[{"name":"パンフ","rank":1},{"name":"企画","rank":2},{"name":"舞台","rank":3},{"name":"広報","rank":4},{"name":"常任","rank":5},{"name":"模擬","rank":6}],"reason":"先輩同級生と関わり増やしたいし、大学在学中に何かみんなと協力して成し遂げてみたいと思ったから"},{"id":"26-354","name":"西海　功庸","kana":"ニシウミ　コウヨウ","depts":[{"name":"常任","rank":1},{"name":"パンフ","rank":2},{"name":"模擬","rank":3},{"name":"ライブ","rank":4},{"name":"構成","rank":5},{"name":"講演","rank":6}],"reason":"私が情祭に入りたいと思った理由を端的に言うと、一つは楽しそうやしかっこいい、もう一つは自分自身のある能力を伸ばしたいからです。\n\n楽しそうやしかっこいい、と思ったのは入学する前にサークルを探していた時、情祭のインスタを見つけました。めちゃくちゃ楽しそうなのが画面越しでも伝わってきて、すぐに入りたくなりました。\nその後どの局に入ろうかなと各局の紹介を見た時、常任に一目惚れしました。一番かっこいい。仕事内容なども自分のもう一つの志望動機を満たすものだったので、常任を第一志望とさせてもらいました。\n\n自分自身の伸ばしたいある能力とは、相手の立場になって物事を考える力です。\n私は将来何をしたいかはまだ決まっていないのですが、起業でも就職でも人と関わる仕事をしたいと思っています。その際に必要となる能力を考え中高生の頃、感じたことを思い出しました。\n私は中学生の時に体育祭の団長を務めさせてもらってたのですが、中学一、ニ、三年生に指示を素直に聞いてもらうのは難しく、特に列に並ばせるのに苦労していましたが、「並んで」と言っていたのを「並んで欲しいな」という指示ではなくお願いという形に変えてみると見違えるようにすぐに並ぶようになってくれました。考えてみれば、相手にとっては指示よりもお願いの方がやってあげようという気持ちになりやすいです。その時、相手の立場になって考える力というのはとても大事な能力だということに気づきました。高校生の時には、逆に厳しめに指示するタイミングなども掴みました。しかし、少人数規模での活動が多かったので、もっと大規模な団体でこの能力を伸ばしたいと思っていました。\nその時、情祭と常任を見つけました。常任は一番規模が大きく、違うキャンパスの人も集まるので、色んな立場や価値観が発生すると考え、まさに自分の望む環境だと思い、絶対にここに入ってやろうと決意しました。\n第二〜第六志望に外局を志望しているのも、外局の方が自分が成長できると思ったからです。\n\n長々と書きましたが、結局楽しみたいが9割って感じです。\n\n2回生では委員長になって情祭を引っ張っていき、3回生になっても残って活動したいです。\n\n\n\n面接よろしくお願いします。"},{"id":"情26ー0089","name":"大上莉央","kana":"オオウエリオ","depts":[{"name":"舞台","rank":1}],"reason":"舞台局に入り、表現力を付けたいと考えています。舞台局の先輩、同級だけでなく、他の局の先輩たちとも仲良くしたいと思っています。"},{"id":"情26-195","name":"齊藤陽","kana":"サイトウハル","depts":[{"name":"パンフ","rank":1},{"name":"ステ外","rank":2},{"name":"模擬","rank":3},{"name":"講演","rank":4},{"name":"ライブ","rank":5},{"name":"広報","rank":6}],"reason":"大学入学する前に、高槻キャンパスにあるサークルなどを探していたところ情祭のインスタのアカウントを見つけ入学前から気になっていました。履修相談会に参加させて頂き先輩方ともお喋りしてさらに情祭に入りたいなと思いました。\n本キャンパスの人とも外局であれば関わる機会があるところや、企業訪問であったり、模擬店の管理などといった他のサークルでは経験できないことをすることができるのも魅力的だなと思いました。"},{"id":"情26-0006","name":"赤澤 琳子","kana":"アカザワ リコ","depts":[{"name":"構成","rank":1},{"name":"舞台","rank":2},{"name":"模擬","rank":3}],"reason":"小中で生徒会に入っており、その際イベントや行事を作りあげることが一番好きだったので、大学でより本格的な企画に携わりたいと思ったから。"},{"id":"情26-493","name":"柳田拓杜","kana":"ヤナギダタクト","depts":[{"name":"舞台","rank":1},{"name":"構成","rank":2},{"name":"企画","rank":3},{"name":"ステ外","rank":4},{"name":"ライブ","rank":5},{"name":"広報","rank":6}],"reason":"キャンパス祭や統一祭に向けて全員で準備して最高のものを作り上げるところがかっこいいと思い、自分もそれに参加したいと思いました。"},{"id":"情26-92","name":"逢阪律心","kana":"オオサカリッシン","depts":[{"name":"模擬","rank":1},{"name":"舞台","rank":2},{"name":"ステ外","rank":3},{"name":"企画","rank":4}],"reason":"先輩との関わりを学びたい。大学生活を充実させたい。活動内容に興味があった。一緒に活動をしたい先輩がいた。"},{"id":"26ー309","name":"出渕 壮真","kana":"デブチ ソウマ","depts":[{"name":"舞台","rank":1},{"name":"ライブ","rank":2},{"name":"講演","rank":3},{"name":"ステ外","rank":4},{"name":"企画","rank":5},{"name":"模擬","rank":6}],"reason":"大学生活を謳歌するための友達や人脈を作りたい！！！関祭を盛り上げたい！！"},{"id":"情26-467","name":"三好慧拓","kana":"ミヨシケイタ","depts":[{"name":"構成","rank":1}],"reason":"同じ情祭や他の学部の方々友好を深めさらに交流を増やすためとコミュ力向上のため！"},{"id":"情26-0098","name":"岡田　千悠留","kana":"オカダ　チハル","depts":[{"name":"舞台","rank":1},{"name":"ステ外","rank":2},{"name":"広報","rank":3},{"name":"模擬","rank":4},{"name":"パンフ","rank":5},{"name":"備品","rank":6}],"reason":"高校時代、文化祭の実行委員として企画や運営に携わり、仲間と協力して一つの行事を作り上げる達成感を得ました。\nその経験から、イベントを通して人に楽しさや感動を届ける活動に魅力を感じました。\nまた、楽しそうに活動する先輩方の姿を見て、その一員としてキャンパス祭や統一祭を盛り上げたいと強く思いました。\n情祭では、コミュニケーション力と笑顔を活かし、先輩方や同期と協力しながら、来場者に楽しんでもらえるような企画づくりに主体的に取り組みたいと考え、志望しました。"},{"id":"情26-0196","name":"斉藤芳輝","kana":"サイトウヨシキ","depts":[{"name":"模擬","rank":1},{"name":"構成","rank":2},{"name":"企画","rank":3},{"name":"財務","rank":4},{"name":"備品","rank":5},{"name":"ステ外","rank":6}],"reason":"学園祭の運営に携わりこれまで以上に学園祭を盛り上げていきたいと強く思ったからです。\n僕が入ったら、元気で明るい性格なので雰囲気を明るくできます。また、効率的に作業するのが得意なので効率よく仕事を進めることができます。"},{"id":"情26-376","name":"萩原なるみ","kana":"ハギワラナルミ","depts":[{"name":"舞台","rank":2},{"name":"パンフ","rank":3},{"name":"財務","rank":4},{"name":"ステ外","rank":5},{"name":"構成","rank":6}],"reason":"色々なことに挑戦したい気持ちがあり、情祭ならばそれが実現できると考えました。また、人の役に立てるような仕事が大好きなので、自分に合っていると思いました。昔から委員会には興味がありましたが、部活が運動部だったため時間が取れないと判断して入るのを断念したのですが、今の大学生活ならまだ時間があるし、今しか出来ないことをやりたいと考え、情祭に入りたいと思いました。"},{"id":"情26-0226","name":"島津江 佳歩","kana":"シマヅエ カホ","depts":[{"name":"舞台","rank":1},{"name":"パンフ","rank":2},{"name":"ステ外","rank":3},{"name":"備品","rank":4}],"reason":"先輩みんな優しくてさいっこうに面白いから"},{"id":"情26-0232","name":"下川愛","kana":"シモカワココロ","depts":[{"name":"ライブ","rank":1},{"name":"舞台","rank":2},{"name":"ステ外","rank":3}],"reason":"きっかけはガクチカを作りたいと思って調べ始めましたが、先輩方と話すうちに情祭自体の楽しそうな雰囲気に惹かれて入りたいと思いました。人と話すことや友達と盛り上がることをするのが好きなので、文化祭の賑やかな雰囲気が好きで、自分もその中心でイベントを盛り上げる側として関わりたいと思い志望しました。\nでも、任された仕事は最後まで責任を持ってやり切ることを大切にしており、準備や裏方の作業にも積極的に取り組みたいと考えています。\n多くの人と関わりながら、来場者にとって思い出に残る文化祭を作れるよう貢献したいです。"},{"id":"情26-0528","name":"吉永康大","kana":"ヨシナガコウダイ","depts":[{"name":"構成","rank":1},{"name":"常任","rank":2},{"name":"模擬","rank":3},{"name":"パンフ","rank":4},{"name":"広報","rank":5},{"name":"財務","rank":6},{"name":"備品","rank":6}],"reason":"一つ目の動機として、昔に関大の統一祭に遊びに来た時に得たワクワクする感覚を、自身が運営に加わることで新たな世代、今の学生に味わって欲しいと考えるからである。\n\n二つ目の動機は、総合情報学部の実行委員会である情祭実行委員において、より総合情報学部の強みであるWebサイト等のメディアを利用した広報活動、また他の公認団体やサークル、模擬店出店者、ステージ出演者の方々との連携による情祭、統一祭での運営効率化や新たなコンテンツ提供による学生、お客様の体験向上を実現したいと考える点である。\n現時点で考えている具体的な構想として、\n①情祭、統一祭における告知Webサイトのデザインやコンテンツの充実度の向上\n②ステージや模擬出店の情報をweb申請、または一部にWebを噛ませることで、ステージプログラム、出店の情報をそのまま告知サイトと連携、直前まで出店者が常に内容の更新ができるようにすることなどを構想している。\n\n自身のWeb開発に関する知識はまだ未熟ではあるが、自身がプログラミングサークルであるVersearに所属している点を有効活用し、入会した暁にはよりITに強い情祭の一端を担っていきたい。"},{"id":"情26-0510","name":"山本　央仁朗","kana":"ヤマモト　オウジロウ","depts":[{"name":"ステ外","rank":1}],"reason":"大学生活に深みを出したい！"},{"id":"情報26-289","name":"谷村和佳乃","kana":"タニムラワカノ","depts":[{"name":"舞台","rank":1},{"name":"ステ外","rank":2}],"reason":"インスタを見ていて準備期間や合宿などが楽しそうだったからです！私も先輩方と一緒に学園祭を盛り上げたいと思いました！"},{"id":"情26-476","name":"森響輝","kana":"モリヒビキ","depts":[{"name":"パンフ","rank":1},{"name":"講演","rank":2}],"reason":"楽しそうだったから！"},{"id":"情26-0014","name":"穴見菜々美","kana":"アナミナナミ","depts":[{"name":"ステ外","rank":1},{"name":"広報","rank":2},{"name":"舞台","rank":3},{"name":"パンフ","rank":4},{"name":"備品","rank":5},{"name":"模擬","rank":6}],"reason":"インスタを拝見させていただいて、すごく楽しそうだなと感じ、私も一員になりたいと思いました。地元の先輩、高校の先輩もいて、心強いので、一生懸命頑張りたいです。"},{"id":"情26-24","name":"安藤　優那","kana":"アンドウ ユナ","depts":[{"name":"パンフ","rank":1},{"name":"常任","rank":2},{"name":"広報","rank":3},{"name":"企画","rank":4}],"reason":"総合情報学部に入学すると決まった時からずっとインスタグラムなどでどのサークルに入るか検索をしていたところ、情祭のインスタを見つけ、まずは第一印象としてとても楽しそうだなと思ったのとそれに何かを一緒に頑張って成し遂げるのは絆が生まれると思うし、先輩後輩ともとても仲良くなれるのではないかと思い気になりました。その後局紹介などを見て自分は千里山の方々とも沢山関わっていきたいし、外局の会議などがとても楽しそうで外局に入りたいとなりました。その中でもインスタを見るとパンフレット局は遊びがとても多そうで楽しそうだなと感じたのととても仲良さそうだったので特に気になりました。実際学校が始まって新歓などの様子を見てみると皆さんとても仲良くて、わいわいしていてとても楽しそうだし青春が送れそうと思ってより入りたいなという気持ちが強くなりました。もちろん第1希望の局に入りたいという気持ちはありますが、情祭に入れるだけでもとても楽しいんだろうなと思いました。もし入れたら、皆さんと学祭をより盛り上げたいと思っております！よろしくお願いします！"},{"id":"情26-0255","name":"高木こころ","kana":"タカギココロ","depts":[{"name":"パンフ","rank":1},{"name":"舞台","rank":2},{"name":"構成","rank":3},{"name":"ステ外","rank":4},{"name":"講演","rank":5},{"name":"ライブ","rank":6}],"reason":"元々学祭に関わりたいと入学当初から思っていました。説明会や新歓を通して、仕事内容や合宿やドライブなどイベントがあることを知り、たくさんの人達と仲良くなれる他、充実した学校生活が送れると思ったからです。"},{"id":"情26-0526","name":"吉田楓菜","kana":"ヨシダカナ","depts":[{"name":"講演","rank":1},{"name":"模擬","rank":2},{"name":"パンフ","rank":3},{"name":"構成","rank":4},{"name":"広報","rank":4},{"name":"財務","rank":5}],"reason":"インスタ見たり、履修登録の相談しに行ったりしたときに楽しそうだと思ったのがきっかけです。知っていくうちに学園祭をただ楽しむだけじゃなくて、楽しさを作り出して周りを盛り上げる側になりたいと思いました。たくさんの人と協力してやりがいもありながら仲良くなって思い出も作れるのは情祭しかないと思ったので志望しました！"},{"id":"情26-0099","name":"岡野　結希奈","kana":"オカノ　ユキナ","depts":[{"name":"パンフ","rank":1},{"name":"ライブ","rank":2},{"name":"講演","rank":3},{"name":"財務","rank":4},{"name":"舞台","rank":5},{"name":"模擬","rank":6}],"reason":"高校の時から関大の学祭実行委員会が楽しそうだし自分も成長しそうでいいなっと思っていて学部が決まってからはすぐインスタをフォローしてずっと入りたいと思ってました。高校の時にダンス部に所属していて、その中に代表4人がいました。4人とも最後にはとても成長してて仲良くなってて楽しそうでした。この実行委員は総情の代表みたいな感じだと思っていて私も総情を盛り上げたいし、成長したいので志望しました。やる気がある仲間と高め合って関大を盛り上げたくて志望しました。"},{"id":"情26-454","name":"三澤　望未","kana":"ミサワ　ノゾミ","depts":[{"name":"舞台","rank":1},{"name":"ステ外","rank":2}],"reason":"履修登録の際に、情祭の方々に優しく教えていただいて、情祭に入りたいと思いました。そして、情祭のインスタグラムの投稿を見て、更に行きたいと思ったからです。"},{"id":"情26-0322","name":"内藤佑生","kana":"ナイトウユウキ","depts":[{"name":"パンフ","rank":1},{"name":"ステ外","rank":2},{"name":"財務","rank":3},{"name":"備品","rank":4},{"name":"舞台","rank":5},{"name":"企画","rank":6}],"reason":"高槻キャンパスで精力的に活動してるサークルや部活といえばボラボラか情祭だったので、将来の力になったり、楽しそうだったので情祭に志望しました。"},{"id":"情26-166","name":"日下部みくる","kana":"クサカベミクル","depts":[{"name":"パンフ","rank":1},{"name":"構成","rank":2},{"name":"講演","rank":3},{"name":"ライブ","rank":4},{"name":"ステ外","rank":5},{"name":"広報","rank":6}],"reason":"情祭に興味があってお話会にいくと優しい先輩たちから楽しい話をたくさん聞かせてもらってもっと入りたい気持ちが強くなりました。"},{"id":"情 26-252","name":"宗 七葉","kana":"ソウナナハ","depts":[{"name":"ステ外","rank":1},{"name":"ライブ","rank":2},{"name":"舞台","rank":3},{"name":"構成","rank":4},{"name":"講演","rank":5},{"name":"模擬","rank":6}],"reason":"イベントに関わるのがずっと好きで、他の人と協力して何かを作り上げる経験を大学でしたいと感じたからです。"},{"id":"情26-0226","name":"島津江 佳歩","kana":"シマヅエ カホ","depts":[{"name":"舞台","rank":1},{"name":"構成","rank":2},{"name":"パンフ","rank":3},{"name":"ステ外","rank":4},{"name":"備品","rank":5}],"reason":"先輩みんなやさしくてさいっこうに面白いから"},{"id":"情 26-0061","name":"今村 日菜乃","kana":"イマムラ ヒナノ","depts":[{"name":"常任","rank":1},{"name":"ステ外","rank":2},{"name":"構成","rank":3},{"name":"舞台","rank":4},{"name":"講演","rank":5},{"name":"模擬","rank":6}],"reason":"私は、文化祭を楽しむだけでなく、自分の手でつくり上げる側として関わりたい！と思い志望しました。地元の先輩や先輩方から活動の話、やりがいや魅力を聞いて、自分もこの一員として文化祭を実行する人になりたいと思うようになりました。\nその中でも常任局は、全体の中心となって多くの人と関わりながら文化祭を動かしていく立場であり、人と関わることや物事を動かすことが大好きな私にとって、最も挑戦したい場所です！また、本キャンパスの人と関われる機会が増える点も志望理由の1つとなってます。\nこれまで学級委員長としてクラスの中心に立ち、周囲を見ながら行動してきました。バイトでもクルー同士で連携していつも働いてます！計画を立てて行動する力や、明るく周囲と関わる力にはとても自信があります！！\n常任局の一員として、周囲と積極的に関わりながら文化祭をもっと良いものにできるよう全力で取り組みたいです。そして、自分自身も成長し続けられるよう挑戦していきたいと考えています！よろしくお願いします。"},{"id":"26-426","name":"古川怜花","kana":"フルカワレイカ","depts":[{"name":"舞台","rank":1},{"name":"ステ外","rank":2},{"name":"パンフ","rank":3}],"reason":"大学生活を充実したものにしたい思いがあり、部活やサークルなどを沢山体験していました。その中で17日のリクリエーションに参加した際に、先輩の方たちと親しみやすい良い雰囲気で、また自分のしたかったことにマッチしているおり、ここで頑張りたいと感じたので志望しました。"},{"id":"26-0535","name":"渡辺風香","kana":"ワタナベフウカ","depts":[{"name":"舞台","rank":1},{"name":"ステ外","rank":2},{"name":"パンフ","rank":3}],"reason":"多くの総情生との交流の場が欲しかったから。"},{"id":"情26-0222","name":"澤田歩果","kana":"サワダホノカ","depts":[{"name":"ライブ","rank":1},{"name":"講演","rank":2},{"name":"構成","rank":3},{"name":"舞台","rank":4},{"name":"ステ外","rank":5},{"name":"企画","rank":6}],"reason":"情祭\n高校生の頃に初めて知り、ずっと入りたいと思っていました。学園祭の運営をすることに憧れていたので志望しました。\n\nライブ局\n最近初めてフェスに参加し、その楽しさを知りました。その経験から来場者の方々に最高の時間を届けられるようにアーティストさんたちを支えたいと思いました。先輩方から大変なこともあるがそれ以上にやりがいや楽しいことがたくさんあり、学園祭が終わった後の達成感がすごいというお話しを聞き、私もその一員として関わり、ライブを成功させたいと思い、志望しました。\n\n講演局\n来場者の方々に楽しんでいただくためにタレントさんたちを支えたいと思い、志望しました。\n\n構成局\n企画を一から自分たちで作り上げるところに魅力を感じました。このような機会は少なく、この経験が将来的にも活かせると思い、志望しました。一から考えることでやりがいが感じられると思いました。\n\n舞台局\n幼い頃から人前に立つことが好きで、これまでの経験を活かし、先輩方や同期と協力して多くの人を楽しませたいと思い、志望しました。\n\nステ外局\n高校時代に文化祭で模擬企画に参加し、楽しかったので、今度は自分が企画や運営をする側になり来場者の方々を楽しませたいと考え、志望しました。\n\n企画局\n新歓で先輩方が考えた企画でたくさんの人が楽しんでいる様子を見て、そのような瞬間に関わりたいと思い、志望しました。企画を一から考えることで達成感が得られたり、将来的にも役立つと思い、これを機に挑戦したいなと思いました。\n\nどの局に入っても全力で取り組み、最高に楽しい学園祭を作りたいと考えています。イベントも全て参加したいです。よろしくお願い致します。"},{"id":"情26-0432","name":"本多愛芭","kana":"ホンダマナハ","depts":[{"name":"模擬","rank":1},{"name":"パンフ","rank":2},{"name":"ライブ","rank":3},{"name":"常任","rank":4},{"name":"講演","rank":5},{"name":"財務","rank":6}],"reason":"私が情祭に参加したい理由は、関西大学に入学したからこそできる経験を最大限に活かし、学園祭を盛り上げる一員として貢献したいからです。新歓に参加し先輩方とお話しした際、初対面でも緊張せずに話すことができる雰囲気をつくってくださったことが印象に残りました。その一方で、学園祭に対する真剣な姿勢も感じました。私も情祭に入って、自分自身がただ参加する側ではなく、主体的に関わって意見を述べたり行動したりすることで成長したいと思っています。よろしくお願いします。"},{"id":"情26-0151","name":"北原英奈","kana":"キタハラエナ","depts":[{"name":"舞台","rank":1}],"reason":"高校のダンス部での経験を活かし、多くの人に楽しさや感動を届けたいからです。先輩方が仲良いところを見て、ち自分もその一員として仲間と協力して一つの作品を完成させるという貴重な経験をしてみたいと思いました。"},{"id":"情26-0110","name":"尾下 菜々子","kana":"オシタ ナナコ","depts":[{"name":"ライブ","rank":1},{"name":"パンフ","rank":2},{"name":"模擬","rank":3},{"name":"講演","rank":4},{"name":"ステ外","rank":5},{"name":"舞台","rank":6}],"reason":"私は人に喜んでもらえることにやりがいを感じる性格です。そういう自分の強みを活かして、たくさんの人が関わる文化祭を裏側から支える実行委員に挑戦したいと思いました。来てくれる人や参加する学生にとって「楽しかった」と思ってもらえるように、自分なりに工夫しながら取り組みたいです。また、周りの友達や仲間とも協力しながら、一つのものを作り上げる経験をしてみたいと思い志望しました。\nそして私が第一希望とするLIVE局では、多くの人に楽しさを直接お届けできるところに魅力を感じました。準備から本番まで関わることが出来て、最後にやりきったっと実感できるところにも惹かれました。LIVE局の先輩方と協力しながら、力になれるように一生懸命取り組みたいと思います。よろしくお願い致します。"},{"id":"情26-0095","name":"大塚祐輝","kana":"オオツカユウキ","depts":[{"name":"舞台","rank":1},{"name":"企画","rank":2},{"name":"備品","rank":3},{"name":"財務","rank":4},{"name":"広報","rank":5},{"name":"ステ外","rank":6}],"reason":"志望動機の1つ目は、情祭の履修相談会に参加した際に先輩方が優しく丁寧に教えてくれて、また情祭の先輩方が楽しそうにしており、雰囲気がとても良いという印象を受けました。\n2つ目は、情祭のお話会やイベントなどに参加した際に先輩方が優しく沢山話してくれて皆んな局とか関係なく仲が良くて、特に私が第1志望にしている舞台局は人数も多くとても仲が良いとおっしゃっており舞台局を第1志望にしました。\n3つ目は情祭のイベントなどに参加していた同級生の皆んなも優しく沢山お話ができて良い思い出となったからです。\n以上の理由から私は情祭に入りたいと強く思いました。"},{"id":"情26-406","name":"広理敬大","kana":"ヒロリケイタ","depts":[{"name":"ライブ","rank":1},{"name":"講演","rank":2},{"name":"構成","rank":3},{"name":"パンフ","rank":3},{"name":"模擬","rank":4},{"name":"舞台","rank":5},{"name":"ステ外","rank":6}],"reason":"友達に誘われて楽しそうだと思ったから"},{"id":"情26-0056","name":"井上大河","kana":"イノウエタイガ","depts":[{"name":"講演","rank":1},{"name":"ライブ","rank":2},{"name":"舞台","rank":3},{"name":"ステ外","rank":4}],"reason":"高校の頃生徒会をしていて興味があったのと楽しそうだったからです。"},{"id":"情26-2020","name":"和田空梨","kana":"ワダソラリ","depts":[{"name":"常任","rank":1},{"name":"講演","rank":2},{"name":"舞台","rank":3},{"name":"ステ外","rank":4},{"name":"模擬","rank":5},{"name":"構成","rank":6}],"reason":"私は編入生ではありますが、情祭に入って学生生活がたのしい思い出になるようにしたいな、という思いがあり常任を第一に希望させていただきました。短期大学では学祭実行委員会の副部長を務めていました。規模が小さい中の運営だったので、関西大学のような大きい学園祭でお仕事ができるのはとてもたのしみです。私が選ばれたからには全力で取り組みます！！"},{"id":"情26-0257","name":"高瀬一志","kana":"タカセカズシ","depts":[{"name":"舞台","rank":1},{"name":"ステ外","rank":2}],"reason":"関西大学の大規模な学園祭において、自ら運営に携わることで主体的に活動したいと考えました。また、その過程で他学部の学生とも交流を深め、人間関係の幅を広げたいと思ったからです。"},{"id":"26-0215","name":"佐藤 大空","kana":"サトウ ソラ","depts":[{"name":"パンフ","rank":1},{"name":"ステ外","rank":2}],"reason":"高校で2年間文化祭の係を経験して大きなイベントの運営に関わることにやりがいを感じました。\n大学でもそういった経験をしたいと思い応募しました。"},{"id":"情26-360","name":"西谷光成","kana":"ニシタニコウセイ","depts":[{"name":"パンフ","rank":1},{"name":"講演","rank":2},{"name":"ライブ","rank":3}],"reason":"私は、合格をいただいた大分大学と関西大学のどちらに行くのかをすごく悩んでいました。親や塾の先生とどっちがいいのか毎日考えていました。あるとき先生に自分の中で一番譲れないものを考えてみたらと言われました。自分の中で一番譲れないものは、楽しくて、振り返った時にいい時間だったなと思える時間を過ごすことでした。そのことをメインにどちらにしようか考えていた時に、情祭のことを知りました。すごく楽しそうで、みんな仲が良さそうで、やりがいもあって、これが自分の中で1番譲れないものだなと感じました。なので、わたしは情祭に入りたいです。"},{"id":"情26-0206","name":"坂本遥菜","kana":"サカモトハルナ","depts":[{"name":"ライブ","rank":1}],"reason":"私は中学生で体育祭実行委員、高校で文化祭のクラス代表を務め、高校1年生から高校3年生までの3年間でイベントスタッフとしてアルバイトをしていました。その経験から、イベントを支える側をしたいという思いが強くあり、特にライブ局でライブという大きなイベントを支える裏方のお仕事がしたいと思い、応募しました。"},{"id":"情26-350","name":"長戸葵依","kana":"ナガトアオイ","depts":[{"name":"常任","rank":1},{"name":"模擬","rank":2},{"name":"ステ外","rank":3},{"name":"舞台","rank":4}],"reason":"常任の幹人さんと話して楽しそうだと思いました。"},{"id":"情26-0210","name":"笹井梨瑚","kana":"ササイリコ","depts":[{"name":"舞台","rank":1}],"reason":"まず、私は大学生活で様々な経験を積みたいと考えています。情祭では、みんなで楽しめることを考えたり、チームで1から舞台を作り上げる、みんなで一つのことをするという経験ができるため、志望しました。\n中学、高校の時は、舞台に立って活動したことはあまり無かったのですが、大学生活では、新しいことに積極的に挑戦したいと考えています。\n　次に、第一志望に舞台局を志望した理由としては、局長のまおさんとお話した際に、楽しそうな雰囲気が伝わってきたこと、人柄も良さそうでみんなが仲がいい感じが伝わってきて、自分もこの輪に入って周りの人も巻き込んで楽しみたいと感じたからです。\n　最後に、私は情祭の舞台局に入ってみんなと楽しめるものを創り上げたいと考えています。よろしくお願いします。"}];
+
+const RC = ['','r1','r2','r3','r4','r5','r6'];
+const LS_KEY = 'jousai_gas_url';
+let GAS_URL = '';
+let order = RAW.map((_,i)=>i);
+let memos = {};
+let doneSet = new Set();
+let searchQ = '';
+let panelOpen = false;
+let pollTimer = null;
+let saving = false;
+let lastSaved = '';
+
+// ══ GAS API ═══════════════════════════════════════════════
+async function gasGet(key) {
+  const r = await fetch(`${GAS_URL}?key=${encodeURIComponent(key)}`);
+  if (!r.ok) throw new Error('GET failed');
+  const j = await r.json();
+  return j.value ?? null;
+}
+async function gasSet(key, value) {
+  const r = await fetch(GAS_URL, {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({key, value})
+  });
+  if (!r.ok) throw new Error('POST failed');
+}
+
+// ══ SYNC ══════════════════════════════════════════════════
+async function loadRemote() {
+  try {
+    const [ro, rm, rd] = await Promise.all([
+      gasGet('order'), gasGet('memos'), gasGet('done')
+    ]);
+    let changed = false;
+    if (ro) { const v = JSON.parse(ro); if (JSON.stringify(v) !== JSON.stringify(order)) { order=v; changed=true; } }
+    if (rm) { const v = JSON.parse(rm); if (JSON.stringify(v) !== JSON.stringify(memos)) { memos=v; changed=true; } }
+    if (rd) { const v = JSON.parse(rd); const ns = new Set(v); if ([...ns].sort().join()!=[...doneSet].sort().join()) { doneSet=ns; changed=true; } }
+    setSyncOk();
+    if (changed) { render(); if (panelOpen) renderSortList(); }
+  } catch(e) { setSyncErr(); }
+}
+
+async function saveRemote() {
+  if (saving) return;
+  const snap = JSON.stringify({order, memos, done:[...doneSet]});
+  if (snap === lastSaved) return;
+  saving = true; setSyncIng();
+  try {
+    await Promise.all([
+      gasSet('order', JSON.stringify(order)),
+      gasSet('memos', JSON.stringify(memos)),
+      gasSet('done',  JSON.stringify([...doneSet]))
+    ]);
+    lastSaved = snap; setSyncOk();
+  } catch(e) { setSyncErr(); }
+  saving = false;
+}
+
+function setSyncOk()  { sd().className='sync-dot ok';  sl().textContent='同期済み'; }
+function setSyncIng() { sd().className='sync-dot';     sl().textContent='同期中…'; }
+function setSyncErr() { sd().className='sync-dot err'; sl().textContent='同期エラー'; }
+const sd = () => document.getElementById('syncDot');
+const sl = () => document.getElementById('syncLabel');
+
+function startPolling() {
+  if (pollTimer) clearInterval(pollTimer);
+  pollTimer = setInterval(loadRemote, 4000);
+}
+
+// ══ SETUP ═════════════════════════════════════════════════
+function checkSetup() {
+  const saved = localStorage.getItem(LS_KEY);
+  if (saved) { GAS_URL = saved; showMain(); }
+  else { document.getElementById('setupScreen').style.display='flex'; }
+}
+
+document.getElementById('setupSaveBtn').addEventListener('click', async () => {
+  const url = document.getElementById('gasUrlInput').value.trim();
+  if (!url.startsWith('https://')) return;
+  const btn = document.getElementById('setupSaveBtn');
+  btn.disabled = true; btn.textContent = '接続確認中…';
+  document.getElementById('setupErr').style.display='none';
+  try {
+    GAS_URL = url;
+    await gasGet('order');
+    localStorage.setItem(LS_KEY, url);
+    showMain();
+  } catch(e) {
+    document.getElementById('setupErr').style.display='block';
+    btn.disabled=false; btn.textContent='接続して始める';
+  }
+});
+
+document.getElementById('resetUrlBtn').addEventListener('click', () => {
+  if (!confirm('GAS URLを再設定しますか？')) return;
+  clearInterval(pollTimer);
+  localStorage.removeItem(LS_KEY);
+  document.getElementById('mainApp').style.display='none';
+  document.getElementById('setupScreen').style.display='flex';
+  document.getElementById('gasUrlInput').value = '';
+});
+
+function showMain() {
+  document.getElementById('setupScreen').style.display='none';
+  document.getElementById('mainApp').style.display='block';
+  loadRemote().then(()=>{ render(); startPolling(); });
+}
+
+// ══ SEARCH ════════════════════════════════════════════════
+document.getElementById('searchInput').addEventListener('input', e => {
+  searchQ = e.target.value.trim(); render();
+});
+
+// ══ SORT PANEL ════════════════════════════════════════════
+document.getElementById('openSortBtn').addEventListener('click', openPanel);
+document.getElementById('closeSortBtn').addEventListener('click', closePanel);
+document.getElementById('overlay').addEventListener('click', closePanel);
+
+function openPanel()  { panelOpen=true;  document.getElementById('overlay').classList.add('open'); document.getElementById('sortPanel').classList.add('open'); renderSortList(); }
+function closePanel() { panelOpen=false; document.getElementById('overlay').classList.remove('open'); document.getElementById('sortPanel').classList.remove('open'); }
+
+let sortDrag=null, tSrc=null, tClone=null, tOffY=0;
+
+function renderSortList() {
+  const sl = document.getElementById('sortList');
+  sl.innerHTML = '';
+  order.forEach((idx, pos) => {
+    const s = RAW[idx];
+    const d1 = s.depts[0];
+    const el = document.createElement('div');
+    el.className = 'sort-item'; el.dataset.idx = idx; el.draggable = true;
+    el.innerHTML = `<span class="sort-num">${pos+1}</span>
+      <div style="flex:1;min-width:0;"><div class="sort-name">${s.name}</div><div class="sort-kana">${s.kana}</div></div>
+      ${d1?`<span class="dept-tag r1" style="font-size:11px;padding:2px 8px;">${d1.name}</span>`:''}
+      <span class="sort-handle">⠿</span>`;
+    el.addEventListener('dragstart', e=>{sortDrag=idx; setTimeout(()=>el.classList.add('dragging'),0); e.dataTransfer.effectAllowed='move';});
+    el.addEventListener('dragend', ()=>{el.classList.remove('dragging'); sl.querySelectorAll('.sort-item').forEach(c=>c.classList.remove('drag-over'));});
+    el.addEventListener('dragover', e=>{e.preventDefault(); sl.querySelectorAll('.sort-item').forEach(c=>c.classList.remove('drag-over')); el.classList.add('drag-over');});
+    el.addEventListener('drop', e=>{
+      e.preventDefault(); if(sortDrag===null||sortDrag===idx) return;
+      const f=order.indexOf(sortDrag), t=order.indexOf(idx);
+      order.splice(f,1); order.splice(t,0,sortDrag); sortDrag=null;
+      renderSortList(); render(); saveRemote();
+    });
+    el.addEventListener('touchstart', tStart, {passive:true});
+    el.addEventListener('touchmove', tMove, {passive:false});
+    el.addEventListener('touchend', tEnd);
+    sl.appendChild(el);
+  });
+}
+
+function tStart(e) {
+  const card = e.currentTarget; tSrc = parseInt(card.dataset.idx);
+  const r = card.getBoundingClientRect(); tOffY = e.touches[0].clientY - r.top;
+  tClone = card.cloneNode(true);
+  tClone.style.cssText=`position:fixed;top:${r.top}px;left:${r.left}px;width:${r.width}px;opacity:.75;pointer-events:none;z-index:9999;border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.18);`;
+  document.body.appendChild(tClone); card.style.opacity='.25';
+}
+function tMove(e) {
+  if(!tClone) return; e.preventDefault();
+  tClone.style.top=(e.touches[0].clientY-tOffY)+'px';
+  const sl=document.getElementById('sortList');
+  sl.querySelectorAll('.sort-item').forEach(c=>c.classList.remove('drag-over'));
+  const over=document.elementsFromPoint(e.touches[0].clientX,e.touches[0].clientY).find(el=>el.classList&&el.classList.contains('sort-item')&&parseInt(el.dataset.idx)!==tSrc);
+  if(over) over.classList.add('drag-over');
+}
+function tEnd(e) {
+  if(!tClone) return; tClone.remove(); tClone=null;
+  document.querySelectorAll('.sort-item').forEach(c=>{c.style.opacity='';c.classList.remove('drag-over');});
+  const over=document.elementsFromPoint(e.changedTouches[0].clientX,e.changedTouches[0].clientY).find(el=>el.classList&&el.classList.contains('sort-item')&&parseInt(el.dataset.idx)!==tSrc);
+  if(over){const ti=parseInt(over.dataset.idx),f=order.indexOf(tSrc),t=order.indexOf(ti);order.splice(f,1);order.splice(t,0,tSrc);renderSortList();render();saveRemote();}
+  tSrc=null;
+}
+
+// ══ CARDS ════════════════════════════════════════════════
+function filteredOrder() {
+  return order.filter(i => {
+    if (!searchQ) return true;
+    const s = RAW[i];
+    return s.name.includes(searchQ)||s.kana.includes(searchQ)||s.id.includes(searchQ);
+  });
+}
+
+function render() {
+  const fo = filteredOrder();
+  document.getElementById('countPill').textContent = fo.length+'名';
+  const list = document.getElementById('cardList');
+  list.innerHTML = '';
+  if (!fo.length) { list.innerHTML='<div class="empty">該当者なし</div>'; return; }
+  fo.forEach((idx, pos) => {
+    const s = RAW[idx];
+    const el = document.createElement('div');
+    el.className = 'card'+(doneSet.has(idx)?' is-done':'');
+    el.dataset.idx = idx;
+    const dh = s.depts.map(d=>`<span class="dept-tag ${RC[Math.min(d.rank,6)]}">${d.rank}位 ${d.name}</span>`).join('');
+    const rs = (s.reason||'').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+    const mv = (memos[idx]||'').replace(/</g,'&lt;');
+    el.innerHTML = `
+      <div class="card-header">
+        <div class="order-num">${pos+1}</div>
+        <div class="name-block"><div class="name">${s.name}</div><div class="kana">${s.kana}</div></div>
+        <div class="sid">${s.id}</div>
+      </div>
+      <div class="dept-row">${dh}</div>
+      ${rs?`<div class="reason-block"><div class="reason-label">志望動機</div>
+        <div class="reason-text" id="rt${idx}">${rs}</div>
+        <button class="expand-btn" id="eb${idx}" onclick="toggleR(${idx})">続きを読む ▼</button>
+      </div>`:''}
+      <hr class="div">
+      <div class="memo-block"><div class="memo-label">面接メモ</div>
+        <textarea class="memo-area" placeholder="ここにメモ…" id="memo${idx}">${mv}</textarea>
+      </div>
+      <div class="card-footer">
+        <button class="done-btn${doneSet.has(idx)?' done':''}" onclick="toggleDone(${idx})">${doneSet.has(idx)?'面接済み ✓':'未実施'}</button>
+      </div>`;
+    const ta = el.querySelector('.memo-area');
+    ta.addEventListener('input', ()=>{ memos[idx]=ta.value; autoH(ta); saveRemote(); });
+    ta.addEventListener('focus', ()=>autoH(ta));
+    list.appendChild(el);
+    requestAnimationFrame(()=>{
+      const rt=document.getElementById(`rt${idx}`), eb=document.getElementById(`eb${idx}`);
+      if(rt&&eb&&rt.scrollHeight<=rt.clientHeight+4) eb.style.display='none';
+      const m=document.getElementById(`memo${idx}`); if(m) autoH(m);
+    });
+  });
+}
+
+function autoH(el){el.style.height='auto';el.style.height=el.scrollHeight+'px';}
+function toggleR(idx){const rt=document.getElementById(`rt${idx}`),eb=document.getElementById(`eb${idx}`);if(!rt)return;const e=rt.classList.toggle('expanded');eb.textContent=e?'折りたたむ ▲':'続きを読む ▼';}
+function toggleDone(idx){doneSet.has(idx)?doneSet.delete(idx):doneSet.add(idx);render();if(panelOpen)renderSortList();saveRemote();}
+
+// ══ START ═════════════════════════════════════════════════
+checkSetup();
+</script>
+</body>
+</html>

@@ -166,6 +166,7 @@ async function gasGet(key) {
   const r = await fetch(`${GAS_URL}?key=${encodeURIComponent(key)}`);
   if (!r.ok) throw new Error('GET failed');
   const j = await r.json();
+  if (j.error) throw new Error(j.error);
   return j.value ?? null;
 }
 async function gasSet(key, value) {
@@ -175,6 +176,9 @@ async function gasSet(key, value) {
     body: JSON.stringify({key, value})
   });
   if (!r.ok) throw new Error('POST failed');
+  const j = await r.json();
+  if (j.error) throw new Error(j.error);
+  return j;
 }
 
 // ══ SYNC ══════════════════════════════════════════════════
@@ -386,3 +390,5 @@ checkSetup();
 </script>
 </body>
 </html>
+
+

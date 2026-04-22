@@ -151,7 +151,7 @@ const RAW = [{"id":"情25-101","name":"織田信義テスト","kana":"オダノ�
 
 const RC = ['','r1','r2','r3','r4','r5','r6'];
 const LS_KEY = 'jousai_gas_url';
-let GAS_URL = 'https://script.google.com/macros/s/AKfycbyduv2jAJmn1movGpejWfxUsxRz4qerWA-c6Wpteig5hOQZGy5Yhr3pnJaN4rf_qDEP/exec';
+let GAS_URL = 'https://script.google.com/macros/s/AKfycbzB3ZcIjGUdKVWmwbJ0hxCZfPLSYTE6hTH_mOu3XLc0naI7Vyakelf4b_InDXvKbAs7qA/exec';
 let order = RAW.map((_,i)=>i);
 let memos = {};
 let doneSet = new Set();
@@ -160,57 +160,66 @@ let panelOpen = false;
 let saveTimer = null;
 let pollTimer = null;
 let saving = false;
-let lastSaved = null;
+let lastSaved = '';
 
 // ══ GAS API ═══════════════════════════════════════════════
-async function gasGet() {
-  const r = await fetch(GAS_URL);
-  if (!r.ok) throw new Error('GET failed');
+async function gasGet(key) {
+  console.log('🔄 GET:', key);
+  const r = await fetch(`${GAS_URL}?key=${encodeURIComponent(key)}`);
+  console.log('✓ GET response:', r.status);
+  if (!r.ok) throw new Error(`GET failed: ${r.status}`);
   const j = await r.json();
+  if (j.error) throw new Error(`API error: ${j.error}`);
+  console.log('✓ GET value:', j.value);
   return j.value ?? null;
 }
-async function gasSet(value) {
+async function gasSet(key, value) {
+  console.log('💾 POST:', key, typeof value);
+  const payload = JSON.stringify({key, value});
+  console.log('💾 payload size:', payload.length, 'bytes');
   const r = await fetch(GAS_URL, {
     method: 'POST',
-    body: JSON.stringify({ value })
+    body: payload
   });
-  if (!r.ok) throw new Error('POST failed');
+  console.log('✓ POST response:', r.status);
+  if (!r.ok) throw new Error(`POST failed: ${r.status}`);
+  const j = await r.json();
+  console.log('✓ POST result:', j);
+  if (j.error) throw new Error(`API error: ${j.error}`);
+  return j;
 }
+
 // ══ SYNC ══════════════════════════════════════════════════
 async function loadRemote() {
   try {
-    const raw = await gasGet();
-    if (!raw) { setSyncOk(); return; }
-    const remote = JSON.parse(raw);
+    console.log('🔄 loadRemote started');
+    const [ro, rm, rd] = await Promise.all([
+      gasGet('order'), gasGet('memos'), gasGet('done')
+    ]);
     let changed = false;
-    if (remote.order && JSON.stringify(remote.order) !== JSON.stringify(order)) {
-      order = remote.order; changed = true;
-    }
-    if (remote.memos && JSON.stringify(remote.memos) !== JSON.stringify(memos)) {
-      memos = remote.memos; changed = true;
-    }
-    if (remote.done) {
-      const ns = new Set(remote.done);
-      if ([...ns].sort().join() !== [...doneSet].sort().join()) {
-        doneSet = ns; changed = true;
-      }
-    }
+    if (ro) { const v = JSON.parse(ro); if (JSON.stringify(v) !== JSON.stringify(order)) { order=v; changed=true; console.log('✓ order updated'); } }
+    if (rm) { const v = JSON.parse(rm); if (JSON.stringify(v) !== JSON.stringify(memos)) { memos=v; changed=true; console.log('✓ memos updated'); } }
+    if (rd) { const v = JSON.parse(rd); const ns = new Set(v); if ([...ns].sort().join()!=[...doneSet].sort().join()) { doneSet=ns; changed=true; console.log('✓ done updated'); } }
     setSyncOk();
-    if (changed && !document.activeElement.closest('.memo-area')) {
-      render(); if (panelOpen) renderSortList();
-    }
-  } catch(e) { setSyncErr(); }
+    if (changed && !document.activeElement.closest('.memo-area')) { render(); if (panelOpen) renderSortList(); }
+  } catch(e) { console.error('❌ loadRemote error:', e); setSyncErr(); }
 }
 
 async function saveRemote() {
   if (saving) return;
-  const snap = JSON.stringify({ order, memos, done: [...doneSet] });
-  if (snap === lastSaved) return;
+  const snap = JSON.stringify({order, memos, done:[...doneSet]});
+  if (snap === lastSaved) { console.log('⏭️ saveRemote: no changes'); return; }
   saving = true; setSyncIng();
   try {
-    await gasSet(snap);
+    console.log('💾 saveRemote: sending data...');
+    await Promise.all([
+      gasSet('order', JSON.stringify(order)),
+      gasSet('memos', JSON.stringify(memos)),
+      gasSet('done',  JSON.stringify([...doneSet]))
+    ]);
     lastSaved = snap; setSyncOk();
-  } catch(e) { setSyncErr(); }
+    console.log('✓ saveRemote: success');
+  } catch(e) { console.error('❌ saveRemote error:', e); setSyncErr(); }
   saving = false;
 }
 
@@ -240,7 +249,7 @@ document.getElementById('setupSaveBtn').addEventListener('click', async () => {
   document.getElementById('setupErr').style.display='none';
   try {
     GAS_URL = url;
-    await gasGet();
+    await gasGet('order');
     localStorage.setItem(LS_KEY, url);
     showMain();
   } catch(e) {
@@ -261,7 +270,7 @@ document.getElementById('resetUrlBtn').addEventListener('click', () => {
 function showMain() {
   document.getElementById('setupScreen').style.display='none';
   document.getElementById('mainApp').style.display='block';
-  loadRemote().then(()=>{ render(); saveRemote(); startPolling(); });
+  loadRemote().then(()=>{ render(); startPolling(); });
 }
 
 // ══ SEARCH ════════════════════════════════════════════════
@@ -400,5 +409,3 @@ checkSetup();
 </script>
 </body>
 </html>
-
-

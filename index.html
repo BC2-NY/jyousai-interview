@@ -261,7 +261,7 @@ document.getElementById('resetUrlBtn').addEventListener('click', () => {
 function showMain() {
   document.getElementById('setupScreen').style.display='none';
   document.getElementById('mainApp').style.display='block';
-  loadRemote().then(()=>{ render(); startPolling(); });
+  loadRemote().then(()=>{ render(); saveRemote(); startPolling(); });
 }
 
 // ══ SEARCH ════════════════════════════════════════════════
